@@ -7,8 +7,6 @@ let token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNhbG1hbm5hcXY0Nj
 export const API = axios.create({
     baseURL: BaseApiUrl,
     headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
         "authorization": token
     }
 })
