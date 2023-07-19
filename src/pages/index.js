@@ -4,8 +4,8 @@ import { useEffect, useState } from 'react';
 import { getAllOrder, updateOrderStatus, updateStatus } from '@/API/add';
 import { useDisclosure } from '@mantine/hooks';
 import Btn from '@/layout/components/Btn';
-import Loader from '@/layout/components/loader';
 import OrderDetails from '@/layout/OrderDetails';
+import LoaderSection from '@/layout/components/LoaderSection';
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -78,16 +78,16 @@ export default function Home() {
 
   return (
     <>
-      <Loader state={loader} />
+      <LoaderSection state={loader} />
 
       <main
         className={`flex min-h-screen flex-col items-center p-24 ${inter.className}`}
       >
         <div className='text-4xl font-semibold'>Emrsive Admin Panel</div>
 
-        <ScrollArea className='mt-10 max-w-[1400px]' type='always'>
+        <ScrollArea className='mt-10 max-w-[1400px] w-full bg-gray-200' type='always'>
           <Table className='w-[2000px] mb-4' fontSize="xl">
-            <thead>
+            <thead className='bg-gray-400'>
               <tr>
                 <th>Name</th>
                 <th>Company</th>
