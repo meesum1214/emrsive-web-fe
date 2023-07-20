@@ -43,7 +43,7 @@ export default () => {
             localStorage.setItem("emrsive-token", res.token)
             showNotification({
                 title: 'Success',
-                message: 'Account Created Successfully',
+                message: 'You have successfully Logged in!',
                 color: 'teal',
                 autoClose: 3000,
             });
