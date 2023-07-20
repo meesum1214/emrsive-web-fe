@@ -1,11 +1,13 @@
 import { Inter } from 'next/font/google'
-import { Modal, Pagination, ScrollArea, Select, Table } from '@mantine/core'
+import { Modal, Select, Table } from '@mantine/core'
 import { useEffect, useState } from 'react';
-import { getAllOrder, updateOrderStatus, updateStatus } from '@/API/add';
+import { deleteOrder, getAllOrder, updateOrderStatus } from '@/API/add';
 import { useDisclosure } from '@mantine/hooks';
 import Btn from '@/layout/components/Btn';
 import OrderDetails from '@/layout/OrderDetails';
 import LoaderSection from '@/layout/components/LoaderSection';
+import { useRouter } from 'next/router';
+import { showNotification } from '@mantine/notifications';
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -18,48 +20,70 @@ export default function Home() {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [loader, setLoader] = useState(true)
 
+  const router = useRouter()
+
   const [count, setCount] = useState(0)
 
   const getAll = () => {
     getAllOrder().then((res) => {
-      console.log(res)
+      // console.log(res)
       setOrders(res.data)
       setLoader(false)
     })
   }
 
   useEffect(() => {
+    if (!localStorage.getItem("emrsive-token")) {
+      router.push("/login")
+    }
+
     setTimeout(() => {
       getAll();
     }, 700);
   }, [count])
 
-  const [activePage, setPage] = useState(1);
+  // const [activePage, setPage] = useState(1);
+
+  const handleDeleteOrder = (id) => {
+    setLoader(true)
+    deleteOrder(id).then((res) => {
+      console.log(res)
+      setCount(count + 1)
+      showNotification({
+        title: 'Success',
+        message: 'Order Deleted Successfully',
+        color: 'teal',
+        autoClose: 3000,
+      });
+    }).catch((err) => {
+      console.log(err)
+      setLoader(false)
+    })
+  }
 
   const rows = orders.map((order, i) => (
     <tr key={i}>
+      <td>{order.id}</td>
       <td>{`${order.firstName} ${order.lastName}`}</td>
-      <td>{order.companyName}</td>
-      <td>{order.country}</td>
-      <td>{order.address}</td>
-      <td>{order.appartment}</td>
-      <td>{order.city}</td>
-      <td>{order.state}</td>
-      <td>{order.zipCode}</td>
-      <td>{order.phone}</td>
-      <td>{order.additionalInfo}</td>
-      <td>{`${order.user.firstName} ${order.user.lastName}`}</td>
+      <td>{order.createdAt.substring(0, 10)}</td>
       <td>
         <div
-          className='bg-gray-300 w- h-10 rounded-full flex justify-center items-center font-semibold cursor-pointer hover:shadow-lg transition-all'
+          className='bg-gray-300 h-7 rounded-full flex justify-center items-center font-semibold cursor-pointer hover:shadow-lg transition-all text-base'
           onClick={() => { setOrderId(order.id); open() }}
         >{order.orderStatus}</div>
       </td>
+      <td>${order.orderPrice}</td>
       <td>
         <Btn
-          onClick={() => { setOrderId(order.id); setDetailsOpen(true) }}
+          onClick={() => { localStorage.setItem("emrsive-order", JSON.stringify(order)), router.push("/order") }}
           style="bg-green-500 hover:bg-green-600"
         >More</Btn>
+      </td>
+      <td>
+        <Btn
+          onClick={() => handleDeleteOrder(order.id)}
+          style="bg-red-500 hover:bg-red-600"
+        >Delete</Btn>
       </td>
     </tr>
   ));
@@ -76,44 +100,46 @@ export default function Home() {
     })
   }
 
+  const logout = () => {
+    setLoader(true)
+    localStorage.removeItem("emrsive-token")
+    localStorage.removeItem("emrsive-order")
+    router.push("/login")
+  }
+
   return (
     <>
       <LoaderSection state={loader} />
+
+      <div className='absolute top-5 right-5'>
+        <Btn style="bg-blue-500" onClick={logout}>Logout</Btn>
+      </div>
 
       <main
         className={`flex min-h-screen flex-col items-center p-24 ${inter.className}`}
       >
         <div className='text-4xl font-semibold'>Emrsive Admin Panel</div>
 
-        <ScrollArea className='mt-10 max-w-[1400px] w-full bg-gray-200' type='always'>
-          <Table className='w-[2000px] mb-4' fontSize="xl">
-            <thead className='bg-gray-400'>
-              <tr>
-                <th>Name</th>
-                <th>Company</th>
-                <th>Country</th>
-                <th>Address</th>
-                <th>Appartment</th>
-                <th>City</th>
-                <th>State</th>
-                <th>Zip Code</th>
-                <th>Phone Number</th>
-                <th>Additional Information</th>
-                <th>User Name</th>
-                <th>Order Status</th>
-                <th>Details</th>
-              </tr>
-            </thead>
-            <tbody>{rows}</tbody>
-          </Table>
-        </ScrollArea>
+        {/* <ScrollArea className='mt-10 max-w-[1400px] w-full bg-gray-200' type='always'> */}
+        <Table className='mt-10 mb-4 max-w-[1000px] w-full' fontSize="xl">
+          <thead className='bg-gray-400'>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Date</th>
+              <th>Order Status</th>
+              <th>Price</th>
+              <th>Details</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>{rows}</tbody>
+        </Table>
+        {/* </ScrollArea> */}
 
-        <div className='flex justify-end w-full mt-8'>
+        {/* <div className='flex justify-end w-full mt-8'>
           <Pagination value={activePage} onChange={setPage} total={10} />
-        </div>
-
-
-
+        </div> */}
 
         <Modal opened={opened} onClose={close} centered withCloseButton={false}>
           <div className='flex flex-col justify-center items-center'>

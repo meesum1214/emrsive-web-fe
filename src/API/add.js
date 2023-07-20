@@ -1,5 +1,16 @@
 import { API } from "./config"
 
+// ================== Authentication ==================
+export const register = async (body) => {
+    let response = await API.post(`/auth/register`, body)
+    return response.data
+}
+
+export const login = async (body) => {
+    let response = await API.post(`/auth/login`, body)
+    return response.data
+}
+
 // ================== Order ==================
 export const placeOrder = async (orderDetails, paymentInfo) => {
     let response = await API.post(`/order/create`, {
@@ -24,6 +35,11 @@ export const updateOrderStatus = async (orderId, status) => {
     return response.data
 }
 
+export const deleteOrder = async (orderId) => {
+    let response = await API.delete(`/order/delete/${orderId}`)
+    return response.data
+}
+
 // ================== Order Details ==================
 export const addOrderDetails = async (body) => {
     let response = await API.post(`/orderDetails/`, body)
@@ -35,7 +51,7 @@ export const getOrderDetails = async (orderId) => {
     return response.data
 }
 
-export const updateStatus = async (orderId, status) => {
-    let response = await API.patch(`/orderDetails/${orderId}`, { status })
+export const updateDetails = async (detail_id, body) => {
+    let response = await API.patch(`/orderDetails/${detail_id}`, body)
     return response.data
 }
