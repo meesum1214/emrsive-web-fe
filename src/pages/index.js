@@ -1,6 +1,6 @@
 import { Inter } from 'next/font/google'
 import { Modal, Select, Table } from '@mantine/core'
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 import { deleteOrder, getAllOrder, updateOrderStatus } from '@/API/add';
 import { useDisclosure } from '@mantine/hooks';
 import Btn from '@/layout/components/Btn';
@@ -32,11 +32,13 @@ export default function Home() {
     })
   }
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!localStorage.getItem("emrsive-token")) {
       router.push("/login")
     }
+  }, [])
 
+  useEffect(() => {
     setTimeout(() => {
       getAll();
     }, 700);
