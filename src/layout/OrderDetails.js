@@ -1,4 +1,4 @@
-import { getOrderDetails, updateDetails } from "@/API/add";
+import { deleteDetails, getOrderDetails, updateDetails } from "@/API/add";
 import { Table } from "@mantine/core";
 import { useEffect, useState } from "react";
 import Btn from "./components/Btn";
@@ -11,6 +11,7 @@ export default ({ setLoader, orderId }) => {
     const [desc, setDesc] = useState([])
     const [planName, setPlanName] = useState("Basic")
     const [detailId, setDetailId] = useState(null)
+    const [change, setChange] = useState(0)
 
     useEffect(() => {
         getOrderDetails(orderId).then((res) => {
@@ -18,7 +19,7 @@ export default ({ setLoader, orderId }) => {
             // setDesc(JSON.parse(res.data[0].Plan.description))
             setPlans(res.data)
         })
-    }, [])
+    }, [change])
 
     const onClick = (name, item, id) => {
         setDetailId(id)
@@ -45,6 +46,31 @@ export default ({ setLoader, orderId }) => {
         })
     };
 
+    const deleteDetail = (id) => {
+        setLoader(true)
+
+        deleteDetails(id).then((res) => {
+            console.log(res)
+            setChange(change + 1)
+            setLoader(false)
+            showNotification({
+                title: 'Success',
+                message: 'Status Updated Successfully',
+                color: 'teal',
+                autoClose: 3000,
+            });
+        }).catch((err) => {
+            console.log(err)
+            showNotification({
+                title: 'Error',
+                message: 'Something went wrong',
+                color: 'red',
+                autoClose: 3000,
+            });
+            setLoader(false)
+        })
+    }
+
     const rows = plans?.map((item, i) => (
         <tr key={i} className={`${detailId && item.id === detailId ? "bg-green-200" : ""} `}>
             <td>{item.id}</td>
@@ -52,7 +78,10 @@ export default ({ setLoader, orderId }) => {
             <td>{item.Plan.price}</td>
             <td>{item.createdAt.substring(0, 10)}</td>
             <td>
-                <Btn style="bg-blue-400" onClick={() => onClick(item.Plan.name, item.description, item.id)}>View</Btn>
+                <Btn style="bg-blue-500" onClick={() => onClick(item.Plan.name, item.description, item.id)}>View</Btn>
+            </td>
+            <td>
+                <Btn style="bg-red-500" onClick={() => deleteDetail(item.id)}>Delete</Btn>
             </td>
         </tr>
     ));
@@ -60,13 +89,14 @@ export default ({ setLoader, orderId }) => {
     return (
         <div className='w-full flex flex-col items-center'>
             <Table fontSize="xl" className="">
-                <thead>
+                <thead className="bg-blue-300">
                     <tr>
                         <th>ID</th>
                         <th>Plan Name</th>
                         <th>Amount</th>
                         <th>Created Date</th>
                         <th>Status</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>{rows}</tbody>

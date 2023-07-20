@@ -55,3 +55,8 @@ export const updateDetails = async (detail_id, body) => {
     let response = await API.patch(`/orderDetails/${detail_id}`, body)
     return response.data
 }
+
+export const deleteDetails = async (detail_id) => {
+    let response = await API.delete(`/orderDetails/${detail_id}`)
+    return response.data
+}
