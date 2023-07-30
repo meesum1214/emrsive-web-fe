@@ -1,4 +1,21 @@
-import { API } from "./config"
+// import { API } from "./config"
+import axios from "axios";
+
+export const BaseApiUrl = 'http://localhost:3002/api'
+
+let token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNhbG1hbm5hcXY0NjFAZ21haWwuY29tIiwiaWF0IjoxNjg1NzkzNjUwfQ.Rd-U0FVIHucqjV7_PzZ-Ez56ORr6amRuzdbp-xjG79U'
+
+const  API = axios.create({
+    baseURL: BaseApiUrl,
+    // headers: {
+    //     "authorization": token
+    // }
+})
+
+export const setToken = (token) => {
+    API.defaults.headers.common["Authorization"] = `${token}`;
+}
+
 
 // ================== Authentication ==================
 export const register = async (body) => {
@@ -8,6 +25,7 @@ export const register = async (body) => {
 
 export const login = async (body) => {
     let response = await API.post(`/auth/login`, body)
+    setToken(response.data.token)
     return response.data
 }
 
@@ -25,8 +43,18 @@ export const getOrders = async (userId) => {
     return response.data
 }
 
-export const getAllOrder = async () => {
-    let response = await API.get(`/order/getAll`)
+export const getAllOrder = async (paginationInfo) => {
+    let response = await API.get(`/order/getAll?value=${paginationInfo.value}&page=${paginationInfo.page}&limit=${paginationInfo.limit}`)
+    return response.data
+}
+
+export const getOrdersByMonth = async (paginationInfo) => {
+    let response = await API.get(`/order/bymonth/${paginationInfo.value}/${paginationInfo.page}/${paginationInfo.limit}`)
+    return response.data
+}
+
+export const getOrdersByDate = async (paginationInfo) => {
+    let response = await API.get(`/order/bydate/${paginationInfo.value}/${paginationInfo.page}/${paginationInfo.limit}`)
     return response.data
 }
 

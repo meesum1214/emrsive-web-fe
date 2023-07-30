@@ -1,5 +1,5 @@
 import { Inter } from 'next/font/google'
-import { Modal, Select, Table } from '@mantine/core'
+import { Input, Modal, Pagination, Select, Table } from '@mantine/core'
 import { useEffect, useLayoutEffect, useState } from 'react';
 import { deleteOrder, getAllOrder, updateOrderStatus } from '@/API/add';
 import { useDisclosure } from '@mantine/hooks';
@@ -8,26 +8,38 @@ import OrderDetails from '@/layout/OrderDetails';
 import LoaderSection from '@/layout/components/LoaderSection';
 import { useRouter } from 'next/router';
 import { showNotification } from '@mantine/notifications';
+import { AiOutlineSearch } from 'react-icons/ai'
+import OrderTable from '@/layout/Screens/Order/OrderTable';
+import { DatePicker, MonthPicker } from '@mantine/dates';
 
 const inter = Inter({ subsets: ['latin'] })
 
 export default function Home() {
 
-  const [orders, setOrders] = useState([])
-  const [orderId, setOrderId] = useState(null)
-  const [status, setStatus] = useState(null)
-  const [opened, { open, close }] = useDisclosure(false);
-  const [detailsOpen, setDetailsOpen] = useState(false);
-  const [loader, setLoader] = useState(true)
-
   const router = useRouter()
 
-  const [count, setCount] = useState(0)
+  const [orders, setOrders] = useState([])
+  const [loader, setLoader] = useState(true)
+  const [count, setCount] = useState(false)
+  const [paginationInfo, setPaginationInfo] = useState({
+    value: "",
+    page: 1,
+    limit: 8,
+  })
 
   const getAll = () => {
-    getAllOrder().then((res) => {
+    getAllOrder(paginationInfo).then((res) => {
       // console.log(res)
       setOrders(res.data)
+      setLoader(false)
+    }).catch((err) => {
+      showNotification({
+        title: 'Error',
+        message: err.response.data.message,
+        color: 'red',
+        autoClose: 3000,
+      });
+      console.log(err)
       setLoader(false)
     })
   }
@@ -39,68 +51,10 @@ export default function Home() {
   }, [])
 
   useEffect(() => {
-    setTimeout(() => {
-      getAll();
-    }, 700);
+    getAll();
   }, [count])
 
-  // const [activePage, setPage] = useState(1);
 
-  const handleDeleteOrder = (id) => {
-    setLoader(true)
-    deleteOrder(id).then((res) => {
-      console.log(res)
-      setCount(count + 1)
-      showNotification({
-        title: 'Success',
-        message: 'Order Deleted Successfully',
-        color: 'teal',
-        autoClose: 3000,
-      });
-    }).catch((err) => {
-      console.log(err)
-      setLoader(false)
-    })
-  }
-
-  const rows = orders.map((order, i) => (
-    <tr key={i}>
-      <td>{order.id}</td>
-      <td>{`${order.firstName} ${order.lastName}`}</td>
-      <td>{order.createdAt.substring(0, 10)}</td>
-      <td>
-        <div
-          className='bg-gray-300 h-7 rounded-full flex justify-center items-center font-semibold cursor-pointer hover:shadow-lg transition-all text-base'
-          onClick={() => { setOrderId(order.id); open() }}
-        >{order.orderStatus}</div>
-      </td>
-      <td>${order.orderPrice}</td>
-      <td>
-        <Btn
-          onClick={() => { localStorage.setItem("emrsive-order", JSON.stringify(order)), router.push("/order") }}
-          style="bg-green-500 hover:bg-green-600"
-        >More</Btn>
-      </td>
-      <td>
-        <Btn
-          onClick={() => handleDeleteOrder(order.id)}
-          style="bg-red-500 hover:bg-red-600"
-        >Delete</Btn>
-      </td>
-    </tr>
-  ));
-
-  const statusUpdate = () => {
-    setLoader(true)
-    close()
-    updateOrderStatus(orderId, status).then((res) => {
-      console.log(res)
-      setCount(count + 1)
-    }).catch((err) => {
-      console.log(err)
-      setLoader(false)
-    })
-  }
 
   const logout = () => {
     setLoader(true)
@@ -113,65 +67,55 @@ export default function Home() {
     <>
       <LoaderSection state={loader} />
 
-      <div className='absolute top-5 right-5'>
+      <div className='flex justify-between px-10 pt-5'>
+        <div className='text-4xl font-semibold'>Emrsive Admin Panel</div>
         <Btn style="bg-blue-500" onClick={logout}>Logout</Btn>
       </div>
 
       <main
-        className={`flex min-h-screen flex-col items-center p-24 ${inter.className}`}
+        className={`flex min-h-screen flex-col items-center mt-4 ${inter.className}`}
       >
-        <div className='text-4xl font-semibold'>Emrsive Admin Panel</div>
+        <div className='max-w-[1000px] w-full'>
 
-        {/* <ScrollArea className='mt-10 max-w-[1400px] w-full bg-gray-200' type='always'> */}
-        <Table className='mt-10 mb-4 max-w-[1000px] w-full' fontSize="xl">
-          <thead className='bg-gray-400'>
-            <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>Date</th>
-              <th>Order Status</th>
-              <th>Price</th>
-              <th>Details</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>{rows}</tbody>
-        </Table>
-        {/* </ScrollArea> */}
+          <div className='w-full flex justify-between'>
+            <div className='text-3xl font-semibold'>Orders</div>
 
-        {/* <div className='flex justify-end w-full mt-8'>
-          <Pagination value={activePage} onChange={setPage} total={10} />
-        </div> */}
-
-        <Modal opened={opened} onClose={close} centered withCloseButton={false}>
-          <div className='flex flex-col justify-center items-center'>
-            <div className='text-2xl font-semibold mb-10'>Update Order Status</div>
-
-            <Select
-              className='sm:w-2/3 w-full'
-              dropdownPosition='bottom'
-              placeholder="Pick one"
-              data={[
-                { value: 'Pending', label: 'Pending' },
-                { value: 'In Progress', label: 'In Progress' },
-                { value: 'Half Completed', label: 'Half Completed' },
-                { value: 'Completed', label: 'Completed' },
-              ]}
-              clearable
-              value={status}
-              onChange={(value) => setStatus(value)}
-            />
-
-            <div className='sm:w-2/3 w-full mt-5 flex justify-evenly'>
-              <Btn style="bg-red-500" onClick={close}>Cancel</Btn>
-              <Btn style="bg-blue-500" onClick={statusUpdate}>Save</Btn>
+            <div className='flex'>
+              <MonthPicker onChange={(e) => {
+                setPaginationInfo({ ...paginationInfo, value: `${e.getFullYear()}-${(e.getMonth() + 1) < 10 ? `0${e.getMonth() + 1}`: e.getMonth() + 1}` });
+                setCount(!count)
+              }} />
+              <DatePicker onChange={(e) => {
+                setPaginationInfo({ ...paginationInfo, value: `${e.getFullYear()}-${(e.getMonth() + 1) < 10 ? `0${e.getMonth() + 1}`: e.getMonth() + 1}-${e.getDate()}` });
+                setCount(!count)
+              }} />
+              <Input
+                placeholder="Search"
+                icon={<AiOutlineSearch />}
+                value={paginationInfo.value}
+                onChange={(e) => {
+                  setPaginationInfo({ ...paginationInfo, value: e.target.value });
+                  setCount(!count)
+                }}
+                className='ml-2'
+              />
             </div>
           </div>
-        </Modal>
 
-        <Modal opened={detailsOpen} onClose={() => setDetailsOpen(false)} centered withCloseButton={false} size="xl">
-          <OrderDetails orderId={orderId} />
-        </Modal>
+          <OrderTable orders={orders} count={count} setCount={setCount} setLoader={setLoader} />
+
+          <div className='flex justify-end w-full mt-8'>
+            <Pagination
+              value={paginationInfo.page}
+              onChange={(page) => {
+                setPaginationInfo({ ...paginationInfo, page });
+                setCount(!count)
+              }}
+              total={10}
+            />
+          </div>
+
+        </div>
 
 
       </main>

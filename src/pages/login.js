@@ -49,10 +49,10 @@ export default () => {
             });
             router.push("/")
         }).catch((err) => {
-            // console.log(err)
+            console.log(err)
             showNotification({
                 title: 'Error',
-                message: err.response.data.message,
+                message: err?.response?.data.message,
                 color: 'red',
                 autoClose: 3000,
             });
