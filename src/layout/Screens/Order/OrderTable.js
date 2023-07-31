@@ -19,8 +19,8 @@ export default ({ orders, count, setCount, setLoader }) => {
         <tr key={i} className="bg-gray-100 border-b-2 border-gray-300">
             <td>{order.id}</td>
             <td>{`${order.firstName} ${order.lastName}`}</td>
-            <td>{order.createdAt.substring(0, 10)}</td>
             <td>${order.orderPrice}</td>
+            <td>{order.createdAt.substring(0, 10)}</td>
             <td>
                 <div
                     className='bg-gray-300 h-7 w-40 rounded-full flex justify-center items-center font-semibold cursor-pointer hover:shadow-lg transition-all text-base'
@@ -73,14 +73,14 @@ export default ({ orders, count, setCount, setLoader }) => {
 
 
     return (
-        <div className="h-[490px] bg-gray-100">
-            <Table className='mt-2 mb-4 w-full' fontSize="xl">
+        <div className="h-[460px] bg-gray-100">
+            <Table className='my-2 w-full' fontSize="xl">
                 <thead className='bg-gray-400'>
                     <tr>
                         <th>ID</th>
                         <th>Name</th>
-                        <th>Date</th>
                         <th>Price</th>
+                        <th>Date</th>
                         <th>Order Status</th>
                         <th>Details</th>
                         <th></th>

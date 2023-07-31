@@ -48,13 +48,8 @@ export const getAllOrder = async (paginationInfo) => {
     return response.data
 }
 
-export const getOrdersByMonth = async (paginationInfo) => {
-    let response = await API.get(`/order/bymonth/${paginationInfo.value}/${paginationInfo.page}/${paginationInfo.limit}`)
-    return response.data
-}
-
-export const getOrdersByDate = async (paginationInfo) => {
-    let response = await API.get(`/order/bydate/${paginationInfo.value}/${paginationInfo.page}/${paginationInfo.limit}`)
+export const getByPlanId = async (paginationInfo) => {
+    let response = await API.get(`/order/byplan?planId=${paginationInfo.planId}&page=${paginationInfo.page}&limit=${paginationInfo.limit}`)
     return response.data
 }
 

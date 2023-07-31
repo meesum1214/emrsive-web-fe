@@ -1,16 +1,15 @@
 import { Inter } from 'next/font/google'
-import { Input, Modal, Pagination, Select, Table } from '@mantine/core'
+import { Button, Divider, Input, Pagination, Popover, Select, Tooltip } from '@mantine/core'
 import { useEffect, useLayoutEffect, useState } from 'react';
-import { deleteOrder, getAllOrder, updateOrderStatus } from '@/API/add';
-import { useDisclosure } from '@mantine/hooks';
+import { getAllOrder, getByPlanId } from '@/API/add';
 import Btn from '@/layout/components/Btn';
-import OrderDetails from '@/layout/OrderDetails';
 import LoaderSection from '@/layout/components/LoaderSection';
 import { useRouter } from 'next/router';
 import { showNotification } from '@mantine/notifications';
-import { AiOutlineSearch } from 'react-icons/ai'
+import { AiOutlineClear, AiOutlineSearch } from 'react-icons/ai'
 import OrderTable from '@/layout/Screens/Order/OrderTable';
 import { DatePicker, MonthPicker } from '@mantine/dates';
+import Header from '@/layout/components/Header';
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -23,14 +22,17 @@ export default function Home() {
   const [count, setCount] = useState(false)
   const [paginationInfo, setPaginationInfo] = useState({
     value: "",
+    planId: null,
     page: 1,
     limit: 8,
+    totalPages: 1,
   })
 
   const getAll = () => {
     getAllOrder(paginationInfo).then((res) => {
-      // console.log(res)
+      // console.log(res.data)
       setOrders(res.data)
+      setPaginationInfo({ ...paginationInfo, totalPages: res.totalPages, planId: null })
       setLoader(false)
     }).catch((err) => {
       showNotification({
@@ -45,7 +47,8 @@ export default function Home() {
   }
 
   useLayoutEffect(() => {
-    if (!localStorage.getItem("emrsive-token")) {
+    let token = localStorage.getItem("emrsive-token")
+    if (!token) {
       router.push("/login")
     }
   }, [])
@@ -54,26 +57,36 @@ export default function Home() {
     getAll();
   }, [count])
 
+  const searchByPlan = (e) => {
+    if (!e) {
+      getAll();
+      return;
+    }
+    getByPlanId({ ...paginationInfo, page: 1, planId: e }).then((res) => {
+      setOrders(res.data)
+      setPaginationInfo({ ...paginationInfo, totalPages: res.totalPages, page: 1, planId: e, value: "" })
+      setLoader(false)
+    }).catch((err) => {
+      showNotification({
+        title: 'Error',
+        message: err.response.data.message,
+        color: 'red',
+        autoClose: 3000,
+      });
+      console.log(err)
+      setLoader(false)
+    })
 
-
-  const logout = () => {
-    setLoader(true)
-    localStorage.removeItem("emrsive-token")
-    localStorage.removeItem("emrsive-order")
-    router.push("/login")
   }
 
   return (
     <>
       <LoaderSection state={loader} />
 
-      <div className='flex justify-between px-10 pt-5'>
-        <div className='text-4xl font-semibold'>Emrsive Admin Panel</div>
-        <Btn style="bg-blue-500" onClick={logout}>Logout</Btn>
-      </div>
+      <Header setLoader={setLoader} />
 
       <main
-        className={`flex min-h-screen flex-col items-center mt-4 ${inter.className}`}
+        className={`flex flex-col items-center mt-8 ${inter.className}`}
       >
         <div className='max-w-[1000px] w-full'>
 
@@ -81,24 +94,77 @@ export default function Home() {
             <div className='text-3xl font-semibold'>Orders</div>
 
             <div className='flex'>
-              <MonthPicker onChange={(e) => {
-                setPaginationInfo({ ...paginationInfo, value: `${e.getFullYear()}-${(e.getMonth() + 1) < 10 ? `0${e.getMonth() + 1}`: e.getMonth() + 1}` });
-                setCount(!count)
-              }} />
-              <DatePicker onChange={(e) => {
-                setPaginationInfo({ ...paginationInfo, value: `${e.getFullYear()}-${(e.getMonth() + 1) < 10 ? `0${e.getMonth() + 1}`: e.getMonth() + 1}-${e.getDate()}` });
-                setCount(!count)
-              }} />
+
+              <Select
+                className='mr-2'
+                dropdownPosition='bottom'
+                placeholder="Search By Plan"
+                data={[
+                  { value: 1, label: 'Basic Shopify Plan' },
+                  { value: 2, label: 'Standard Shopify Plan' },
+                  { value: 3, label: 'Premium Shopify Plan' },
+                ]}
+                clearable
+                value={paginationInfo.planId}
+                onChange={searchByPlan}
+              />
+
+              <Popover position="bottom" withArrow shadow="md">
+                <Popover.Target>
+                  <div className='mr-2'>
+                    <Btn style="bg-blue-500 w-32">Select Date</Btn>
+                  </div>
+                </Popover.Target>
+                <Popover.Dropdown>
+                  <DatePicker
+                    value={paginationInfo.value}
+                    onChange={(e) => {
+                      setPaginationInfo({ ...paginationInfo, page: 1, value: `${e.getFullYear()}-${(e.getMonth() + 1) < 10 ? `0${e.getMonth() + 1}` : e.getMonth() + 1}-${e.getDate()}` });
+                      setCount(!count)
+                    }}
+                    placeholder="Select date"
+                  />
+                </Popover.Dropdown>
+              </Popover>
+
+              <Popover position="bottom" withArrow shadow="md">
+                <Popover.Target>
+                  <div>
+                    <Btn style="bg-blue-500 w-32">Select Month</Btn>
+                  </div>
+                </Popover.Target>
+                <Popover.Dropdown>
+                  <MonthPicker
+                    value={paginationInfo.value}
+                    onChange={(e) => {
+                      setPaginationInfo({ ...paginationInfo, page: 1, value: `${e.getFullYear()}-${(e.getMonth() + 1) < 10 ? `0${e.getMonth() + 1}` : e.getMonth() + 1}` });
+                      setCount(!count)
+                    }}
+                  />
+                </Popover.Dropdown>
+              </Popover>
+
               <Input
                 placeholder="Search"
                 icon={<AiOutlineSearch />}
                 value={paginationInfo.value}
                 onChange={(e) => {
-                  setPaginationInfo({ ...paginationInfo, value: e.target.value });
+                  setPaginationInfo({ ...paginationInfo, page: 1, value: e.target.value });
                   setCount(!count)
                 }}
                 className='ml-2'
               />
+
+
+              <Tooltip label="Clear Filters">
+                <div>
+                  <AiOutlineClear className='cursor-pointer' size={35} onClick={() => {
+                    setPaginationInfo({ ...paginationInfo, page: 1, value: "", planId: null });
+                    setCount(!count)
+                  }} />
+                </div>
+              </Tooltip>
+
             </div>
           </div>
 
@@ -111,7 +177,7 @@ export default function Home() {
                 setPaginationInfo({ ...paginationInfo, page });
                 setCount(!count)
               }}
-              total={10}
+              total={paginationInfo.totalPages}
             />
           </div>
 

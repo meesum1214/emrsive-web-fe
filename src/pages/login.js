@@ -41,6 +41,7 @@ export default () => {
         login(data).then((res) => {
             console.log(res)
             localStorage.setItem("emrsive-token", res.token)
+            localStorage.setItem("emrsive-user", JSON.stringify(res.data))
             showNotification({
                 title: 'Success',
                 message: 'You have successfully Logged in!',
