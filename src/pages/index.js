@@ -1,6 +1,6 @@
 import { Inter } from 'next/font/google'
-import { Button, Divider, Input, Pagination, Popover, Select, Tooltip } from '@mantine/core'
-import { useEffect, useLayoutEffect, useState } from 'react';
+import { Input, Pagination, Popover, Select, Tooltip } from '@mantine/core'
+import { useEffect, useState } from 'react';
 import { getAllOrder, getByPlanId } from '@/API/add';
 import Btn from '@/layout/components/Btn';
 import LoaderSection from '@/layout/components/LoaderSection';
@@ -29,6 +29,11 @@ export default function Home() {
   })
 
   const getAll = () => {
+    let token = localStorage.getItem("emrsive-token")
+    if (!token) {
+      router.push("/login")
+    }
+
     getAllOrder(paginationInfo).then((res) => {
       // console.log(res.data)
       setOrders(res.data)
@@ -45,13 +50,6 @@ export default function Home() {
       setLoader(false)
     })
   }
-
-  useLayoutEffect(() => {
-    let token = localStorage.getItem("emrsive-token")
-    if (!token) {
-      router.push("/login")
-    }
-  }, [])
 
   useEffect(() => {
     getAll();

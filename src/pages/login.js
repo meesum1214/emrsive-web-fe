@@ -2,7 +2,7 @@ import { login } from "@/API/add"
 import LoaderSection from "@/layout/components/LoaderSection"
 import { showNotification } from "@mantine/notifications"
 import { useRouter } from "next/router"
-import { useEffect, useLayoutEffect, useState } from "react"
+import { useEffect, useState } from "react"
 
 export default () => {
     const router = useRouter()
@@ -12,13 +12,10 @@ export default () => {
         password: "",
     })
 
-    useLayoutEffect(() => {
+    useEffect(() => {
         if (localStorage.getItem("emrsive-token")) {
             router.push("/")
         }
-    }, [])
-
-    useEffect(() => {
         setTimeout(() => {
             setLoader(false)
         }, 500);

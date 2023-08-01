@@ -4,7 +4,7 @@ import LoaderSection from "@/layout/components/LoaderSection";
 import { Divider } from "@mantine/core";
 import { showNotification } from "@mantine/notifications";
 import { useRouter } from "next/router";
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 export default () => {
     const [loader, setLoader] = useState(true)
@@ -12,7 +12,7 @@ export default () => {
 
     const router = useRouter()
 
-    useLayoutEffect(() => {
+    useEffect(() => {
         let o = JSON.parse(localStorage.getItem("emrsive-order"))
         if (!o) {
             showNotification({
@@ -25,9 +25,7 @@ export default () => {
         } else {
             setOrder(o)
         }
-    }, [])
 
-    useEffect(() => {
         setTimeout(() => {
             setLoader(false)
         }, 500);

@@ -22,7 +22,7 @@ export default ({ setLoader }) => {
     }
     return (
         <div className='flex items-center justify-between px-10 py-1 bg-orange-400'>
-            <Image src='/logo.png' width={150} height={50} />
+            <Image src='/logo.png' alt="Logo" width={150} height={50} className="w-auto h-auto" />
 
             <div className='text-3xl font-semibold text-white'>Emrsive Admin Panel</div>
 
