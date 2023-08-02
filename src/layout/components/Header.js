@@ -36,7 +36,7 @@ export default ({ setLoader }) => {
     return (
         <header className="text-gray-600 body-font border-b">
             <div className="container mx-auto flex flex-wrap px-5 py-2 flex-col md:flex-row items-center">
-                <Image src='/logo.png' alt="Logo" width={100} height={50} className="w-auto h-auto cursor-pointer" />
+                <Image src='/logo.png' alt="Logo" width={100} height={50} className="w-auto h-auto cursor-pointer" onClick={() => router.push("/")} />
                 <nav className="md:ml-auto md:mr-auto flex flex-wrap items-center text-base justify-center">
                     {
                         menu.map((item, i) => (

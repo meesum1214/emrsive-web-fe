@@ -84,7 +84,7 @@ export default function Home() {
             <Header setLoader={setLoader} />
 
             <main
-                className={`flex flex-col items-center mt-8 ${inter.className}`}
+                className={`flex flex-col items-center mt-6 ${inter.className}`}
             >
                 <div className='max-w-[1000px] w-full'>
 

@@ -3,7 +3,8 @@ import axios from "axios";
 
 export const BaseApiUrl = 'http://localhost:3002/api'
 
-let token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNhbG1hbm5hcXY0NjFAZ21haWwuY29tIiwiaWF0IjoxNjg1NzkzNjUwfQ.Rd-U0FVIHucqjV7_PzZ-Ez56ORr6amRuzdbp-xjG79U'
+// let token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNhbG1hbm5hcXY0NjFAZ21haWwuY29tIiwiaWF0IjoxNjg1NzkzNjUwfQ.Rd-U0FVIHucqjV7_PzZ-Ez56ORr6amRuzdbp-xjG79U'
+// let token = ""
 
 const  API = axios.create({
     baseURL: BaseApiUrl,
@@ -81,5 +82,11 @@ export const updateDetails = async (detail_id, body) => {
 
 export const deleteDetails = async (detail_id) => {
     let response = await API.delete(`/orderDetails/${detail_id}`)
+    return response.data
+}
+
+// ================== Analytics ==================
+export const getAnalytics = async (startDate, endDate) => {
+    let response = await API.get(`/dashboard?startDate=${startDate}&endDate=${endDate}`)
     return response.data
 }
