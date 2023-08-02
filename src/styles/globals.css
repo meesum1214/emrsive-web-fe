@@ -15,3 +15,19 @@
     --background-end-rgb: 0, 0, 0;
   }
 }
+
+
+/* Custom CSS animation */
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Apply the animation to the desired element */
+.spinner {
+  animation: spin .7s linear infinite; /* Change the '2s' to control the speed (duration) of the animation */
+}
