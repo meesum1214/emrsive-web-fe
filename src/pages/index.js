@@ -8,8 +8,10 @@ import { Popover, Tooltip } from "@mantine/core"
 import Btn from "@/layout/components/Btn"
 import { DatePicker, MonthPicker } from "@mantine/dates"
 import { AiOutlineClear } from "react-icons/ai"
+import { useRouter } from "next/router"
 
 export default () => {
+  const router = useRouter()
   const [loader, setLoader] = useState(true)
   const [analytics, setAnalytics] = useState(null)
   const [time, setTime] = useState("Overall")
