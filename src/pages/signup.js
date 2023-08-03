@@ -49,6 +49,7 @@ export default () => {
 
         delete data.confirmPassword
         data.role_id = "1"
+        data.email = data.email.toLowerCase()
 
         setLoader(true)
 

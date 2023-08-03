@@ -21,6 +21,7 @@ export const setToken = (token) => {
 // ================== Authentication ==================
 export const register = async (body) => {
     let response = await API.post(`/auth/register`, body)
+    setToken(response.data.token)
     return response.data
 }
 
