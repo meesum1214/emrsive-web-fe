@@ -51,7 +51,7 @@ export default ({ setLoader }) => {
                         </div>
                     </Popover.Target>
                     <Popover.Dropdown>
-                        <div className='font-semibold text-lg'>{userInfo.firstName} {userInfo.lastName}</div>
+                        <div className='font-semibold text-lg'>{userInfo?.firstName} {userInfo?.lastName}</div>
                         <Divider className='my-2' />
                         <div className='flex justify-center'>
                             <Btn style="bg-blue-500" onClick={logout}>Logout</Btn>

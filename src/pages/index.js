@@ -19,6 +19,11 @@ export default () => {
   })
 
   useEffect(() => {
+    let token = localStorage.getItem("emrsive-token")
+    if (!token) {
+      router.push("/login")
+    }
+
     getAnalytics(date.start, date.end).then((res) => {
       // console.log(res.data)
       setAnalytics(res.data)
