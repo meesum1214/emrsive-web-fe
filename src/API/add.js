@@ -1,7 +1,8 @@
 // import { API } from "./config"
 import axios from "axios";
 
-export const BaseApiUrl = 'http://localhost:3002/api'
+// export const BaseApiUrl = 'http://localhost:3002/api'
+export const BaseApiUrl = 'http://43.206.137.78:8080/api'
 
 // let token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNhbG1hbm5hcXY0NjFAZ21haWwuY29tIiwiaWF0IjoxNjg1NzkzNjUwfQ.Rd-U0FVIHucqjV7_PzZ-Ez56ORr6amRuzdbp-xjG79U'
 // let token = ""
